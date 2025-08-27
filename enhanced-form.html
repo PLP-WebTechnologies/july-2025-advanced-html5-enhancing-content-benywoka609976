@@ -1,0 +1,230 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multi-Section Web Page with Enhanced Form</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    header, main, footer {
+      margin-bottom: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    fieldset {
+      margin-bottom: 20px;
+      padding: 15px;
+      border: 1px solid #ccc;
+    }
+    legend {
+      font-weight: bold;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+    }
+    audio, video {
+      width: 100%;
+      margin-bottom: 20px;
+    }
+    footer {
+      text-align: center;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Welcome to Our Community Hub</h1>
+    <p>Explore our resources, upcoming events, and join us by registering below.</p>
+  </header>
+
+  <main>
+    <!-- Lists Section -->
+    <section>
+      <h2>Our Community Features</h2>
+      <h3>Unordered List: Benefits of Joining</h3>
+      <ul>
+        <li>Access to exclusive workshops and webinars</li>
+        <li>Networking opportunities with professionals</li>
+        <li>Monthly newsletters with industry insights</li>
+        <li>Discounts on community events</li>
+      </ul>
+      <h3>Ordered List: Steps to Get Involved</h3>
+      <ol>
+        <li>Register using the form below</li>
+        <li>Attend an orientation session</li>
+        <li>Join a community group</li>
+        <li>Participate in events and activities</li>
+      </ol>
+    </section>
+
+    <!-- Table Section -->
+    <section>
+      <h2>Upcoming Events</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Event Name</th>
+            <th>Date</th>
+            <th>Location</th>
+            <th>Duration</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Tech Talk: AI Innovations</td>
+            <td>2025-09-10</td>
+            <td>Online</td>
+            <td>2 hours</td>
+          </tr>
+          <tr>
+            <td>Networking Mixer</td>
+            <td>2025-09-15</td>
+            <td>Community Center</td>
+            <td>3 hours</td>
+          </tr>
+          <tr>
+            <td>Coding Workshop</td>
+            <td>2025-09-20</td>
+            <td>Tech Hub</td>
+            <td>4 hours</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Media Section -->
+    <section>
+      <h2>Community Highlights</h2>
+      <h3>Listen to Our Podcast</h3>
+      <audio src="https://www.example.com/sample-podcast.mp3" controls>
+        Your browser does not support the audio element.
+      </audio>
+      <h3>Watch Our Latest Event</h3>
+      <video src="https://www.example.com/sample-video.mp4" controls>
+        Your browser does not support the video element.
+      </video>
+    </section>
+
+    <!-- Form Section -->
+    <section>
+      <h2>Join Our Community</h2>
+      <form action="/submit" method="post" novalidate>
+        <fieldset>
+          <legend>Personal Information</legend>
+          <label for="full-name">Full Name:</label>
+          <input type="text" id="full-name" name="full_name" placeholder="Enter your full name" required minlength="2" maxlength="50" pattern="[A-Za-z\s]+" autocomplete="name">
+
+          <label for="email">Email Address:</label>
+          <input type="email" id="email" name="email" placeholder="Enter your email" required autocomplete="email">
+
+          <label for="phone">Phone Number:</label>
+          <input type="tel" id="phone" name="phone" placeholder="Enter your phone number" pattern="[0-9]{10}" title="Enter a 10-digit phone number" autocomplete="tel">
+        </fieldset>
+
+        <fieldset>
+          <legend>Account Details</legend>
+          <label for="username">Username:</label>
+          <input type="text" id="username" name="username" placeholder="Choose a username" required minlength="4" maxlength="20" pattern="[A-Za-z0-9_]+" title="Username can only contain letters, numbers, and underscores">
+
+          <label for="password">Password:</label>
+          <input type="password" id="password" name="password" placeholder="Create a password" required minlength="8" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Password must contain at least one number, one uppercase letter, one lowercase letter, and be at least 8 characters long">
+        </fieldset>
+
+        <fieldset>
+          <legend>Preferences</legend>
+          <label for="interests">Interests:</label>
+          <select id="interests" name="interests" required>
+            <option value="">Select an interest</option>
+            <option value="technology">Technology</option>
+            <option value="networking">Networking</option>
+            <option value="workshops">Workshops</option>
+            <option value="volunteering">Volunteering</option>
+          </select>
+
+          <label for="newsletter">Subscribe to Newsletter:</label>
+          <input type="checkbox" id="newsletter" name="newsletter" checked>
+
+          <label for="bio">Tell Us About Yourself:</label>
+          <textarea id="bio" name="bio" placeholder="Share a brief bio" rows="4" maxlength="200"></textarea>
+        </fieldset>
+
+        <fieldset>
+          <legend>Event Preferences</legend>
+          <label><input type="radio" name="event_type" value="online" required> Online Events</label>
+          <label><input type="radio" name="event_type" value="in-person"> In-Person Events</label>
+        </fieldset>
+
+        <button type="submit">Register</button>
+      </form>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Community Hub. All rights reserved.</p>
+  </footer>
+</body>
+</html>
